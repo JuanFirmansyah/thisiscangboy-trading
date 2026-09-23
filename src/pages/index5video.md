@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Activity,
   AlertTriangle,
@@ -23,6 +24,7 @@ import {
   MessageCircle,
   Moon,
   Music,
+  Play,
   RefreshCw,
   Send,
   ShieldCheck,
@@ -30,12 +32,13 @@ import {
   Sparkles,
   Sun,
   Trophy,
+  User,
   Users,
   Video,
   Zap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { LoadingSpinner } from "@/components/LoadingSpinner"; // ← NEW
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 // ============ KONFIGURASI ============
 const SITE = {
@@ -47,6 +50,12 @@ const SITE = {
   whatsappNumber: "6281241768395",
   profileImage: "/images/thisisocan.jpeg",
   heroBackground: "/hero-bg.jpg",
+  about: {
+    title: "Tentang Cangboy",
+    p1: "Halo, saya Cangboy. Setelah 9 tahun coba berbagai usaha — dari YouTube, bisnis minuman, telur gulung, sampai ekspor arang — akhirnya saya menemukan rumah di trading.",
+    p2: "Lewat halaman ini, saya kumpulkan semua link, panduan, dan komunitas yang saya pakai sehari-hari — supaya kamu tidak perlu bingung mulai dari mana.",
+    p3: "Kalau kamu baru mulai, saya sudah siapkan panduan lengkap dari daftar akun sampai tersambung ke MetaTrader 5. Tinggal ikuti, tidak perlu bingung.",
+  },
   socials: {
     instagram: "https://instagram.com/thisiscangboy",
     tiktok: "https://tiktok.com/@thisiscangboy",
@@ -71,6 +80,8 @@ interface Phase {
   name: string;
   tagline: string;
   icon: LucideIcon;
+  videoId?: string;
+  videoTitle?: string;
   steps: GuideStep[];
 }
 
@@ -115,6 +126,7 @@ interface SmallLink {
   href: string;
   icon: LucideIcon;
   accent: string;
+  external?: boolean;
 }
 
 // ============ DATA PLATFORM ============
@@ -124,7 +136,8 @@ const PLATFORMS: Platform[] = [
     name: "Link Pendaftaran",
     shortDescription:
       "Pendaftaran akun trading resmi + panduan lengkap sampai tersambung ke MetaTrader 5.",
-    referralUrl: "https://sc.myuserhub.com/welcome?returnUrl=%2Faccounts&pt=225883",
+    referralUrl:
+      "https://sc.myuserhub.com/welcome?returnUrl=%2Faccounts&pt=225883",
     recommended: true,
     tags: ["Regulasi Ketat", "MT5", "Ramah Pemula"],
     features: ["Web", "Mobile", "MT5", "Deposit Lokal"],
@@ -136,6 +149,8 @@ const PLATFORMS: Platform[] = [
         name: "Registrasi Akun",
         tagline: "Buat akun trading Anda",
         icon: Zap,
+        videoId: "xbkZudTmOh8",
+        videoTitle: "Tutorial Daftar Akun Trading",
         steps: [
           {
             id: "r1",
@@ -170,7 +185,8 @@ const PLATFORMS: Platform[] = [
             title: "Verifikasi identitas (KYC)",
             description:
               "Unggah foto KTP/SIM dan selfie dengan pencahayaan yang jelas.",
-            warning: "Foto harus jelas, tidak terpotong, dan tidak menggunakan filter.",
+            warning:
+              "Foto harus jelas, tidak terpotong, dan tidak menggunakan filter.",
           },
           {
             id: "r6",
@@ -187,6 +203,8 @@ const PLATFORMS: Platform[] = [
         name: "Hubungkan ke MT5",
         tagline: "Sambungkan akun ke MetaTrader 5",
         icon: Activity,
+        videoId: "xF5ANln4RsA",
+        videoTitle: "Tutorial Connect Akun ke MetaTrader 5",
         steps: [
           {
             id: "m1",
@@ -200,14 +218,16 @@ const PLATFORMS: Platform[] = [
             title: "Buka MT5 & pilih 'Login ke Akun Trading'",
             description:
               "Saat pertama buka, MT5 menawarkan beberapa opsi. Pilih 'Login ke Akun Trading' (BUKAN 'Buka Akun Demo').",
-            warning: "Jangan pilih 'Buka Akun Baru' — itu akan membuat akun demo yang berbeda.",
+            warning:
+              "Jangan pilih 'Buka Akun Baru' — itu akan membuat akun demo yang berbeda.",
           },
           {
             id: "m3",
             title: "Masukkan kredensial dari email",
             description:
               "Isi nomor akun, password MT5, dan nama server yang dikirim platform via email.",
-            warning: "Server harus PERSIS sama dengan yang tertulis di email. Salah server = gagal login.",
+            warning:
+              "Server harus PERSIS sama dengan yang tertulis di email. Salah server = gagal login.",
           },
           {
             id: "m4",
@@ -230,7 +250,11 @@ const PLATFORMS: Platform[] = [
 ];
 
 const LEARN_CARDS: LearnCard[] = [
-  { title: "Dasar Trading", description: "Fundamental trading.", icon: BarChart3 },
+  {
+    title: "Dasar Trading",
+    description: "Fundamental trading.",
+    icon: BarChart3,
+  },
   {
     title: "Manajemen Risiko",
     description: "Kenapa risiko penting.",
@@ -330,6 +354,92 @@ function Confetti({ active }: { active: boolean }) {
   );
 }
 
+// ============ VIDEO EMBED (click-to-play, no autoplay) ============
+interface VideoEmbedProps {
+  videoId: string;
+  title: string;
+  dark: boolean;
+}
+
+function VideoEmbed({ videoId, title, dark }: VideoEmbedProps) {
+  const [playing, setPlaying] = useState<boolean>(false);
+  const [thumbError, setThumbError] = useState<boolean>(false);
+
+  const thumbnail = thumbError
+    ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+    : `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+
+  if (playing) {
+    return (
+      <div
+        className={`relative aspect-video w-full overflow-hidden rounded-2xl border ${
+          dark ? "border-white/10 bg-black" : "border-slate-200 bg-black"
+        }`}
+      >
+        <iframe
+          src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
+          title={title}
+          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          loading="lazy"
+          className="absolute inset-0 h-full w-full"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => setPlaying(true)}
+      aria-label={`Putar video: ${title}`}
+      className={`group relative aspect-video w-full overflow-hidden rounded-2xl border ${
+        dark ? "border-white/10" : "border-slate-200"
+      }`}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={thumbnail}
+        alt={title}
+        onError={() => setThumbError(true)}
+        loading="lazy"
+        className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+      />
+
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10" />
+
+      <div className="absolute inset-0 flex items-center justify-center">
+        <motion.div
+          whileHover={{ scale: 1.12 }}
+          whileTap={{ scale: 0.94 }}
+          className="relative flex h-16 w-16 items-center justify-center rounded-full bg-red-600 shadow-2xl shadow-red-600/40"
+        >
+          <motion.span
+            animate={{ scale: [1, 1.4, 1], opacity: [0.6, 0, 0.6] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+            className="absolute inset-0 rounded-full bg-red-600/60"
+          />
+          <Play className="relative h-6 w-6 fill-white text-white" />
+        </motion.div>
+      </div>
+
+      <div className="absolute inset-x-0 bottom-0 p-4 text-left">
+        <div className="flex items-center gap-2">
+          <span className="flex h-5 items-center rounded bg-red-600 px-1.5 font-mono text-[9px] font-black uppercase tracking-wider text-white">
+            VIDEO
+          </span>
+          <span className="font-mono text-[10px] font-black uppercase tracking-widest text-white/70">
+            Klik untuk putar
+          </span>
+        </div>
+        <p className="mt-1.5 text-sm font-black uppercase tracking-wide text-white">
+          {title}
+        </p>
+      </div>
+    </button>
+  );
+}
+
 // ============ KOMPONEN UTAMA ============
 type CelebrateMode = "phase" | "all" | null;
 
@@ -341,11 +451,11 @@ export default function HomePage() {
   const [expandedStep, setExpandedStep] = useState<string | null>(null);
   const [scrollPct, setScrollPct] = useState<number>(0);
   const [showTop, setShowTop] = useState<boolean>(false);
-  const [booted, setBooted] = useState<boolean>(false); // ← NEW
+  const [booted, setBooted] = useState<boolean>(false);
 
   const platform: Platform = PLATFORMS[0];
 
-  // Boot splash — sembunyikan setelah 900ms // ← NEW
+  // Boot splash
   useEffect(() => {
     const id = window.setTimeout(() => setBooted(true), 900);
     return () => window.clearTimeout(id);
@@ -501,11 +611,20 @@ export default function HomePage() {
   const smallLinks: SmallLink[] = useMemo(
     () => [
       {
+        id: "about",
+        title: "Tentang",
+        href: "#about",
+        icon: User,
+        accent: "amber",
+        external: false,
+      },
+      {
         id: "tg",
         title: "Telegram",
         href: SITE.socials.telegram,
         icon: Send,
         accent: "sky",
+        external: true,
       },
       {
         id: "mt5",
@@ -513,6 +632,7 @@ export default function HomePage() {
         href: "https://www.metatrader5.com/",
         icon: Smartphone,
         accent: "violet",
+        external: true,
       },
       {
         id: "ig",
@@ -520,6 +640,7 @@ export default function HomePage() {
         href: SITE.socials.instagram,
         icon: Camera,
         accent: "rose",
+        external: true,
       },
       {
         id: "yt",
@@ -527,6 +648,7 @@ export default function HomePage() {
         href: SITE.socials.youtube,
         icon: Video,
         accent: "red",
+        external: true,
       },
     ],
     [],
@@ -537,6 +659,7 @@ export default function HomePage() {
     emerald: "from-emerald-400 to-teal-500 shadow-emerald-500/30",
   };
   const smallAccentMap: Record<string, string> = {
+    amber: "text-amber-400 group-hover:bg-amber-500/10",
     sky: "text-sky-400 group-hover:bg-sky-500/10",
     violet: "text-violet-400 group-hover:bg-violet-500/10",
     rose: "text-rose-400 group-hover:bg-rose-500/10",
@@ -545,7 +668,7 @@ export default function HomePage() {
 
   return (
     <>
-      {/* ================= BOOT SPLASH ================= */} {/* ← NEW */}
+      {/* ================= BOOT SPLASH ================= */}
       <AnimatePresence>
         {!booted && (
           <motion.div
@@ -883,6 +1006,145 @@ export default function HomePage() {
             </motion.div>
           </section>
 
+          {/* ================= ABOUT SECTION ================= */}
+          <section id="about" className="scroll-mt-24">
+            <SectionHeader number="00" label="PROFIL" title={SITE.about.title} />
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              className={`relative mt-6 overflow-hidden rounded-3xl border p-6 ${
+                dark
+                  ? "border-white/[0.06] bg-white/[0.02]"
+                  : "border-slate-200/80 bg-white"
+              }`}
+            >
+              <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-amber-400/10 blur-3xl" />
+
+              <div className="relative flex items-start gap-4">
+                <div className="relative h-14 w-14 shrink-0">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      duration: 12,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                    className="absolute inset-0 rounded-2xl bg-[conic-gradient(from_0deg,#fbbf24,#22d3ee,#fbbf24)] opacity-50 blur-[3px]"
+                  />
+                  <div
+                    className={`absolute inset-[2px] rounded-2xl ${
+                      dark ? "bg-[#08090c]" : "bg-white"
+                    }`}
+                  />
+                  <div className="absolute inset-[4px] overflow-hidden rounded-2xl">
+                    <Image
+                      src={SITE.profileImage}
+                      alt={SITE.name}
+                      fill
+                      sizes="56px"
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <p className="font-mono text-[10px] font-black uppercase tracking-[0.25em] text-amber-400">
+                    {"// about_me"}
+                  </p>
+                  <h3 className="mt-1 text-lg font-black uppercase tracking-tight">
+                    {SITE.short}
+                  </h3>
+                  <p
+                    className={`text-[11px] font-semibold ${
+                      dark ? "text-slate-400" : "text-slate-500"
+                    }`}
+                  >
+                    {SITE.handle}
+                  </p>
+                </div>
+              </div>
+
+              <div className="relative mt-5 space-y-3">
+                <p
+                  className={`text-xs leading-relaxed ${
+                    dark ? "text-slate-300" : "text-slate-600"
+                  }`}
+                >
+                  {SITE.about.p1}
+                </p>
+                <p
+                  className={`text-xs leading-relaxed ${
+                    dark ? "text-slate-300" : "text-slate-600"
+                  }`}
+                >
+                  {SITE.about.p2}
+                </p>
+                <p
+                  className={`text-xs leading-relaxed ${
+                    dark ? "text-slate-400" : "text-slate-500"
+                  }`}
+                >
+                  {SITE.about.p3}
+                </p>
+              </div>
+
+              <div className="relative mt-5 flex flex-wrap gap-2">
+                <a
+                  href={waLink("Halo Cangboy!")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500/10 px-3 py-2 font-mono text-[10px] font-black uppercase tracking-widest text-emerald-600 transition hover:bg-emerald-500/20 dark:text-emerald-400"
+                >
+                  <MessageCircle className="h-3 w-3" />
+                  Ngobrol
+                </a>
+                <a
+                  href={SITE.socials.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-rose-500/10 px-3 py-2 font-mono text-[10px] font-black uppercase tracking-widest text-rose-600 transition hover:bg-rose-500/20 dark:text-rose-400"
+                >
+                  <Camera className="h-3 w-3" />
+                  Instagram
+                </a>
+                <a
+                  href={SITE.socials.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-red-500/10 px-3 py-2 font-mono text-[10px] font-black uppercase tracking-widest text-red-600 transition hover:bg-red-500/20 dark:text-red-400"
+                >
+                  <Video className="h-3 w-3" />
+                  YouTube
+                </a>
+              </div>
+
+              {/* Lihat Profil Lengkap */}
+              <div
+                className={`relative mt-5 flex flex-col gap-3 border-t pt-5 sm:flex-row sm:items-center sm:justify-between ${
+                  dark ? "border-white/[0.06]" : "border-slate-200/60"
+                }`}
+              >
+                <p
+                  className={`font-mono text-[10px] uppercase tracking-widest ${
+                    dark ? "text-slate-500" : "text-slate-400"
+                  }`}
+                >
+                  {"// mau kenal lebih dekat?"}
+                </p>
+                <Link
+                  href="/about"
+                  className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2.5 font-mono text-[10px] font-black uppercase tracking-widest text-black shadow-lg shadow-amber-500/20 transition hover:shadow-amber-500/40"
+                >
+                  <User className="h-3.5 w-3.5" />
+                  Lihat Profil Lengkap
+                  <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+                </Link>
+              </div>
+            </motion.div>
+          </section>
+
           {/* ================= SECTION 01: LINKS ================= */}
           <SectionHeader number="01" label="LINK" title="Akses Cepat" />
 
@@ -943,12 +1205,13 @@ export default function HomePage() {
             <div className="grid grid-cols-2 gap-3">
               {smallLinks.map((link, i) => {
                 const Icon = link.icon;
+                const isExternal = link.external !== false;
                 return (
                   <motion.a
                     key={link.id}
                     href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    target={isExternal ? "_blank" : undefined}
+                    rel={isExternal ? "noopener noreferrer" : undefined}
                     initial={{ opacity: 0, y: 12 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.2 }}
@@ -1120,10 +1383,7 @@ export default function HomePage() {
                       }`}
                     >
                       {stat.complete ? (
-                        <Check
-                          className="h-5 w-5 text-black"
-                          strokeWidth={3}
-                        />
+                        <Check className="h-5 w-5 text-black" strokeWidth={3} />
                       ) : (
                         <PhaseIcon
                           className={`h-5 w-5 ${
@@ -1197,6 +1457,42 @@ export default function HomePage() {
                     />
                   </div>
                 </motion.div>
+
+                {/* ===== VIDEO TUTORIAL ===== */}
+                {phase.videoId && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    className="mt-6"
+                  >
+                    <div className="mb-2 flex items-center gap-2">
+                      <span className="flex h-5 items-center gap-1 rounded bg-red-500/10 px-2 font-mono text-[9px] font-black uppercase tracking-widest text-red-500 dark:text-red-400">
+                        <Video className="h-2.5 w-2.5" />
+                        Video
+                      </span>
+                      <span
+                        className={`font-mono text-[10px] font-black uppercase tracking-widest ${
+                          dark ? "text-slate-500" : "text-slate-400"
+                        }`}
+                      >
+                        Tutorial langkah demi langkah
+                      </span>
+                    </div>
+                    <VideoEmbed
+                      videoId={phase.videoId}
+                      title={phase.videoTitle ?? "Video Tutorial"}
+                      dark={dark}
+                    />
+                    <p
+                      className={`mt-2 text-center font-mono text-[10px] ${
+                        dark ? "text-slate-500" : "text-slate-400"
+                      }`}
+                    >
+                      ↓ Lanjut ke langkah tertulis di bawah
+                    </p>
+                  </motion.div>
+                )}
 
                 <section className="relative mt-6">
                   {phase.steps.map((step: GuideStep, i: number) => {

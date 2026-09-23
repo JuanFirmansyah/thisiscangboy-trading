@@ -19,7 +19,6 @@ import {
   ChevronRight,
   Download,
   ExternalLink,
-  Image as ImageIcon,
   Lightbulb,
   MessageCircle,
   Moon,
@@ -71,7 +70,6 @@ interface GuideStep {
   description: string;
   tips?: string;
   warning?: string;
-  image?: string;
 }
 
 interface Phase {
@@ -141,13 +139,13 @@ const PLATFORMS: Platform[] = [
     recommended: true,
     tags: ["Regulasi Ketat", "MT5", "Ramah Pemula"],
     features: ["Web", "Mobile", "MT5", "Deposit Lokal"],
-    estimatedRegistrationTime: "5–10 menit",
+    estimatedRegistrationTime: "10–15 menit",
     phases: [
       {
         id: "phase-registration",
         number: "01",
         name: "Registrasi Akun",
-        tagline: "Buat akun trading Anda",
+        tagline: "Daftar, deposit, & verifikasi grup",
         icon: Zap,
         videoId: "xbkZudTmOh8",
         videoTitle: "Tutorial Daftar Akun Trading",
@@ -195,13 +193,40 @@ const PLATFORMS: Platform[] = [
               "Setelah verifikasi disetujui, Anda akan menerima email berisi nomor akun & detail login MT5.",
             tips: "SIMPAN email ini. Anda akan membutuhkannya untuk fase berikutnya.",
           },
+          {
+            id: "r7",
+            title: "Deposit minimal $20",
+            description:
+              "Lakukan deposit pertama minimal $20 USD untuk mengaktifkan akun dan membuka akses verifikasi grup komunitas.",
+            tips: "Metode deposit lokal tersedia (bank transfer, e-wallet, crypto). Pilih yang paling nyaman buat kamu.",
+            warning:
+              "Pastikan nama pengirim SAMA dengan nama akun trading kamu. Deposit dari nama berbeda bisa ditolak atau tertahan.",
+          },
+          {
+            id: "r8",
+            title: "Screenshot profil & halaman akun",
+            description:
+              "Buka halaman profil dan halaman akun di dashboard. Screenshot yang menampilkan USER ID dan SALDO deposit kamu dengan jelas.",
+            tips: "Pastikan USER ID dan angka saldo terbaca jelas di screenshot. Bukti ini yang akan dipakai Cangboy untuk verifikasi grup.",
+            warning:
+              "Jangan sensor User ID-nya — itu bagian yang paling penting untuk verifikasi. Yang boleh disensor hanya email atau nama lengkap kalau kamu mau.",
+          },
+          {
+            id: "r9",
+            title: "Kirim bukti via WhatsApp",
+            description:
+              "Balik ke thisiscangboy.com, klik tombol WhatsApp Saya di halaman utama. Kirim 2 screenshot tadi (profil & saldo) ke Cangboy untuk diproses masuk grup komunitas.",
+            tips: "Tulis pesan singkat: 'Halo Cangboy, saya sudah daftar dan deposit. Ini bukti User ID & saldo saya.' Lalu attach screenshot.",
+            warning:
+              "JANGAN pernah kirim password, OTP, atau kode verifikasi ke siapa pun — termasuk ke Cangboy. Cangboy tidak akan pernah minta itu.",
+          },
         ],
       },
       {
         id: "phase-mt5",
         number: "02",
         name: "Hubungkan ke MT5",
-        tagline: "Sambungkan akun ke MetaTrader 5",
+        tagline: "Sambungkan akun & setup XAUUSD",
         icon: Activity,
         videoId: "xF5ANln4RsA",
         videoTitle: "Tutorial Connect Akun ke MetaTrader 5",
@@ -243,6 +268,20 @@ const PLATFORMS: Platform[] = [
               "Nama akun dan saldo sudah muncul di panel MT5 Anda. Siap untuk mulai trading.",
             tips: "Coba buka 1 chart (misal XAUUSD) untuk memastikan data harga masuk normal.",
           },
+          {
+            id: "m6",
+            title: "Tambah pair XAUUSD",
+            description:
+              "Klik kanan di panel Market Watch → pilih Symbols (atau tekan Ctrl+U). Cari 'XAUUSD' → klik Show. Pair akan muncul di Market Watch.",
+            tips: "XAUUSD = Gold (Emas) terhadap US Dollar. Pair ini yang paling direkomendasikan untuk pemula karena volatilitasnya stabil dan spread-nya kecil.",
+          },
+          {
+            id: "m7",
+            title: "Hapus pair selain XAUUSD",
+            description:
+              "Klik kanan pada setiap pair lain di Market Watch → pilih Hide. Sisakan hanya XAUUSD supaya panel dan chart bersih.",
+            tips: "Fokus 1 pair dulu lebih baik daripada banyak pair tapi tidak paham. Setelah terbiasa, kamu bisa tambah pair lain.",
+          },
         ],
       },
     ],
@@ -269,10 +308,10 @@ const LEARN_CARDS: LearnCard[] = [
 ];
 
 const START_STEPS: { title: string; description: string }[] = [
-  { title: "Daftar akun", description: "Fase 01 · 6 langkah." },
-  { title: "Hubungkan MT5", description: "Fase 02 · 5 langkah." },
-  { title: "Verifikasi koneksi", description: "Cek saldo & chart." },
-  { title: "Siap trading", description: "Mulai dengan demo." },
+  { title: "Daftar & deposit", description: "Fase 01 · 9 langkah." },
+  { title: "Hubungkan MT5", description: "Fase 02 · 7 langkah." },
+  { title: "Setup XAUUSD", description: "Pair fokus trading." },
+  { title: "Siap trading", description: "Mulai dengan disiplin." },
 ];
 
 const STORAGE_KEY = "thisisocan_progress_v2";
@@ -599,7 +638,7 @@ export default function HomePage() {
       {
         id: "wa",
         title: "WhatsApp",
-        description: "Tanya langsung kalau bingung",
+        description: "Kirim bukti & tanya langsung",
         href: waLink("Halo Cangboy!"),
         icon: MessageCircle,
         accent: "emerald",
@@ -1476,7 +1515,7 @@ export default function HomePage() {
                           dark ? "text-slate-500" : "text-slate-400"
                         }`}
                       >
-                        Tutorial langkah demi langkah
+                        Tonton sambil ceklis langkah
                       </span>
                     </div>
                     <VideoEmbed
@@ -1489,7 +1528,7 @@ export default function HomePage() {
                         dark ? "text-slate-500" : "text-slate-400"
                       }`}
                     >
-                      ↓ Lanjut ke langkah tertulis di bawah
+                      ↓ Ceklis langkah di bawah sambil nonton
                     </p>
                   </motion.div>
                 )}
@@ -1639,49 +1678,10 @@ export default function HomePage() {
                                 transition={{ duration: 0.25 }}
                                 className="overflow-hidden"
                               >
-                                <div className="pt-4">
-                                  <div
-                                    className={`relative aspect-[9/16] w-full overflow-hidden rounded-2xl border ${
-                                      dark
-                                        ? "border-white/10 bg-white/[0.02]"
-                                        : "border-slate-200 bg-slate-50"
-                                    }`}
-                                  >
-                                    {step.image ? (
-                                      // eslint-disable-next-line @next/next/no-img-element
-                                      <img
-                                        src={step.image}
-                                        alt={`Screenshot ${step.title}`}
-                                        className="h-full w-full object-cover"
-                                      />
-                                    ) : (
-                                      <div
-                                        className={`flex h-full w-full flex-col items-center justify-center gap-2 ${
-                                          dark
-                                            ? "text-slate-600"
-                                            : "text-slate-400"
-                                        }`}
-                                      >
-                                        <motion.div
-                                          animate={{ y: [0, -6, 0] }}
-                                          transition={{
-                                            duration: 2,
-                                            repeat: Infinity,
-                                            ease: "easeInOut",
-                                          }}
-                                        >
-                                          <ImageIcon className="h-8 w-8" />
-                                        </motion.div>
-                                        <p className="font-mono text-[10px] font-black uppercase tracking-[0.2em]">
-                                          SCREENSHOT
-                                        </p>
-                                      </div>
-                                    )}
-                                  </div>
-
+                                <div className="pt-4 space-y-2">
                                   {step.tips && (
                                     <div
-                                      className={`mt-3 flex items-start gap-2.5 rounded-xl border p-3 ${
+                                      className={`flex items-start gap-2.5 rounded-xl border p-3 ${
                                         dark
                                           ? "border-cyan-400/20 bg-cyan-400/[0.04]"
                                           : "border-cyan-500/30 bg-cyan-50"
@@ -1707,7 +1707,7 @@ export default function HomePage() {
 
                                   {step.warning && (
                                     <div
-                                      className={`mt-2 flex items-start gap-2.5 rounded-xl border p-3 ${
+                                      className={`flex items-start gap-2.5 rounded-xl border p-3 ${
                                         dark
                                           ? "border-rose-400/20 bg-rose-400/[0.04]"
                                           : "border-rose-500/30 bg-rose-50"
@@ -1731,7 +1731,7 @@ export default function HomePage() {
                                     </div>
                                   )}
 
-                                  <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                                  <div className="flex flex-col gap-2 pt-1 sm:flex-row">
                                     {phase.id === "phase-registration" &&
                                       i === 0 &&
                                       !isDone && (
@@ -1743,6 +1743,21 @@ export default function HomePage() {
                                         >
                                           BUKA LINK
                                           <ExternalLink className="h-3.5 w-3.5" />
+                                        </a>
+                                      )}
+                                    {phase.id === "phase-registration" &&
+                                      step.id === "r9" &&
+                                      !isDone && (
+                                        <a
+                                          href={waLink(
+                                            "Halo Cangboy, saya sudah daftar dan deposit. Ini bukti User ID & saldo saya.",
+                                          )}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-3 font-mono text-[11px] font-black uppercase tracking-wider text-black shadow-lg shadow-emerald-500/30 transition hover:shadow-emerald-500/50"
+                                        >
+                                          KIRIM BUKTI
+                                          <MessageCircle className="h-3.5 w-3.5" />
                                         </a>
                                       )}
                                     {phase.id === "phase-mt5" &&
@@ -1812,8 +1827,8 @@ export default function HomePage() {
                             </p>
                             <h4 className="mt-1 text-lg font-black uppercase tracking-tight">
                               {phase.id === "phase-registration"
-                                ? "Akun kamu sudah jadi ✅"
-                                : "Semua selesai! 🏆"}
+                                ? "Akun & verifikasi grup beres ✅"
+                                : "Setup MT5 selesai! 🏆"}
                             </h4>
                             <p
                               className={`mt-1.5 text-xs leading-relaxed ${
@@ -1821,8 +1836,8 @@ export default function HomePage() {
                               }`}
                             >
                               {phase.id === "phase-registration"
-                                ? "Sekarang lanjut ke fase berikutnya: hubungkan akun ke MetaTrader 5."
-                                : "Akun MT5 sudah tersambung. Waktunya mulai trading dengan aman."}
+                                ? "Sekarang lanjut ke fase berikutnya: hubungkan akun ke MetaTrader 5 dan setup XAUUSD."
+                                : "Akun MT5 sudah tersambung dan XAUUSD siap. Waktunya mulai trading dengan disiplin."}
                             </p>
                             {!isLastPhase && (
                               <a
@@ -1987,7 +2002,8 @@ export default function HomePage() {
                   }`}
                 >
                   Saya bantu arahkan dari pemilihan platform, pendaftaran,
-                  sampai verifikasi akun dan koneksi ke MT5.
+                  deposit, verifikasi grup, sampai koneksi ke MT5 & setup
+                  XAUUSD.
                 </p>
                 <motion.a
                   whileHover={{ y: -2 }}
@@ -2193,8 +2209,8 @@ export default function HomePage() {
                 </h3>
                 <p className="mt-2 text-sm text-slate-400">
                   {celebrate === "all"
-                    ? "Akun MT5 sudah tersambung. Waktunya mulai trading dengan disiplin."
-                    : "Registrasi akun sudah selesai. Lanjut ke fase berikutnya: hubungkan ke MT5."}
+                    ? "Akun MT5 sudah tersambung & XAUUSD siap. Waktunya mulai trading dengan disiplin."
+                    : "Registrasi, deposit, dan verifikasi grup selesai. Lanjut ke fase berikutnya: hubungkan ke MT5."}
                 </p>
                 <button
                   type="button"
