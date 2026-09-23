@@ -222,12 +222,12 @@ const STORY = {
         {
           src: "/images/about/arang-1.jpg",
           alt: "Proses arang",
-          caption: "Proses produksi arang",
+          caption: "Persiapan pengiriman ekspor",
         },
         {
           src: "/images/about/arang-2.jpg",
           alt: "Pengiriman arang",
-          caption: "Persiapan pengiriman ekspor",
+          caption: "Tempat Pengumpulan Arang",
         },
       ],
     },
