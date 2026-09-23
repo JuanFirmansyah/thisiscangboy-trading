@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  AlertTriangle,
   ArrowLeft,
   ArrowRight,
   BookOpen,
@@ -13,19 +12,24 @@ import {
   Briefcase,
   Camera,
   Check,
-  ChevronDown,
   Compass,
-  GraduationCap,
   Heart,
   Lightbulb,
   MessageCircle,
   Quote,
   Send,
   Shield,
+  Ship,
   Sparkles,
+  Store,
   Target,
   TrendingUp,
+  Trophy,
+  Tv,
+  User,
+  Utensils,
   Video,
+  Wrench,
   Zap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -45,12 +49,23 @@ const SITE = {
 } as const;
 
 // ============ TIPE ============
+interface TimelineImage {
+  src: string;
+  alt: string;
+  caption?: string;
+}
+
 interface TimelineItem {
-  year: string;
+  id: string;
+  type: "experience" | "insight";
+  period: string;
   title: string;
+  subtitle?: string;
   description: string;
   icon: LucideIcon;
   tone: "slate" | "amber" | "emerald";
+  images?: TimelineImage[];
+  tag?: string;
 }
 
 interface LessonItem {
@@ -64,81 +79,176 @@ interface PrincipleItem {
   icon: LucideIcon;
 }
 
-// ============ ISI STORY (EDIT DI SINI) ============
+// ============ ISI STORY ============
 const STORY = {
   intro: {
     eyebrow: "// about_me",
     headline: "Dari Anak Biasa Jadi Trader",
     subhead:
-      "Perjalanan saya bukan garis lurus. Ada masa bingung, salah langkah, dan hampir menyerah. Ini ceritanya.",
+      "Perjalanan saya bukan garis lurus. Ada masa bingung, salah langkah, dan hampir menyerah. Ini ceritanya — lengkap dengan jejak usaha yang saya jalani sebelum akhirnya sampai di dunia trading.",
+    quote:
+      "Saya dulu pikir trading itu soal keberuntungan. Sekarang saya tahu, ini soal kedisiplinan dan kesabaran.",
   },
 
-  // Timeline sebelum jadi trader
   timeline: [
     {
-      year: "2016",
-      title: "Lulus SMA, Bingung Mau Ke Mana",
+      id: "youtube",
+      type: "experience",
+      period: "2017 — 2022",
+      title: "YouTube",
+      subtitle: "Content Creator",
       description:
-        "Saya lulus dengan nilai standar. Tidak punya bayangan mau kerja apa. Sementara teman-teman sudah punya rencana jelas, saya masih bingung arah.",
-      icon: GraduationCap,
+        "Awalnya cuma iseng bikin video, tapi di sini saya belajar banyak hal: public speaking, edit video, bikin thumbnail, dan yang paling penting — berani tampil apa adanya. Berkat YouTube juga saya belajar bahwa konten yang jujur itu lebih dihargai daripada yang sok sempurna.",
+      icon: Video,
       tone: "slate",
+      images: [
+        {
+          src: "/images/about/youtube-1.jpg",
+          alt: "Momen YouTube",
+          caption: "Salah satu momen saat bikin konten",
+        },
+      ],
     },
     {
-      year: "2017",
-      title: "Kerja Serabutan",
+      id: "ldr-tea",
+      type: "experience",
+      period: "2019 — 2022",
+      title: "LDR Tea",
+      subtitle: "Business Owner",
       description:
-        "Coba berbagai kerjaan: bantu toko, jasa antar, sampai jadi admin online shop. Gaji pas-pasan, capek fisik, tapi tetap tidak cukup. Saya sadar: kalau begini terus, 5 tahun lagi saya di posisi yang sama.",
-      icon: Briefcase,
-      tone: "slate",
+        "Bisnis minuman pertama saya. Dibangun dari nol bareng tim kecil yang solid. Dari sini saya belajar: leadership bukan soal siapa paling pintar, tapi siapa yang paling bisa dipercaya untuk menjaga amanah. Meskipun akhirnya kami tutup, tim-nya tetap jadi saudara sampai sekarang.",
+      icon: Store,
+      tone: "amber",
+      images: [
+        {
+          src: "/images/about/ldr-tea-1.jpg",
+          alt: "LDR Tea store",
+          caption: "Outlet pertama LDR Tea",
+        },
+        {
+          src: "/images/about/ldr-tea-team.jpg",
+          alt: "Tim LDR Tea",
+          caption: "Tim yang luar biasa",
+        },
+      ],
     },
     {
-      year: "2018",
-      title: "Kenal Dunia Trading dari Teman",
+      id: "kenal-trading",
+      type: "insight",
+      period: "2019",
+      title: "Pertama Kali Kenal Trading",
+      subtitle: "Momen kecil yang mengubah arah",
       description:
-        "Seorang teman menunjukkan chart di HP-nya. Dalam sehari katanya bisa dapat lebih dari gaji saya seminggu. Saya skeptis, tapi penasaran. Malam itu saya pulang dan mulai cari-cari di internet.",
+        "Di tengah sibuknya kerja, saya iseng cari tahu soal trading. Awalnya cuma baca-baca, tidak paham apa-apa. Tapi ada satu hal yang langsung menarik perhatian saya: market itu tidak pandang status. Mau kamu kaya, miskin, pejabat, atau anak kuliahan — aturannya sama. Ini kesetaraan yang tidak saya temukan di tempat kerja biasa.",
       icon: Compass,
       tone: "amber",
     },
     {
-      year: "2019",
-      title: "Terjun Tanpa Ilmu — Dan Kehilangan Modal",
+      id: "telur-gulung",
+      type: "experience",
+      period: "2021 — 2023",
+      title: "Telur Gulung",
+      subtitle: "Street Food Hustle",
       description:
-        "Saya buka akun, deposit, dan langsung trading tanpa belajar. Hasilnya? Modal habis dalam 2 minggu. Saya frustrasi, hampir menyerah, dan sempat berhenti total 3 bulan.",
-      icon: AlertTriangle,
+        "Jualan telur gulung keliling pakai motor. Kadang hujan, kadang dagangan tidak laku, kadang pulang jam 2 pagi. Tapi dari sini saya belajar yang namanya 'hustle' sesungguhnya — tidak ada yang namanya gagal, yang ada cuma belum berhasil. Dan alhamdulillah, tim kecil saya sangat kompak.",
+      icon: Utensils,
       tone: "amber",
+      images: [
+        {
+          src: "/images/about/telur-gulung-1.jpg",
+          alt: "Motor jualan telur gulung",
+          caption: "Motor setia jualan telur gulung",
+        },
+        {
+          src: "/images/about/telur-gulung-team-1.jpg",
+          alt: "Tim telur gulung 1",
+          caption: "Tim jualan",
+        },
+        {
+          src: "/images/about/telur-gulung-team-2.jpg",
+          alt: "Tim telur gulung 2",
+          caption: "Kompak selalu",
+        },
+      ],
     },
     {
-      year: "2020",
-      title: "Mulai dari Nol — Kali Ini Serius",
+      id: "kerja",
+      type: "experience",
+      period: "2023 — 2026",
+      title: "Kerja",
+      subtitle: "Full-time Employee",
       description:
-        "Saya mulai belajar beneran. Baca buku, ikut kelas dasar, latihan di akun demo selama 6 bulan tanpa deposit sama sekali. Saya disiplin dengan risk management dan jurnal trading.",
-      icon: BookOpen,
-      tone: "amber",
+        "Setelah beberapa usaha berjalan, saya juga sempat kerja sebagai karyawan. Bukan karena gagal, tapi karena saya ingin belajar dari dalam: bagaimana sistem kerja besar dibangun, bagaimana tim profesional bergerak. Pengalaman ini yang bikin saya lebih sabar dan terstruktur.",
+      icon: Briefcase,
+      tone: "slate",
+      images: [
+        {
+          src: "/images/about/kerja-1.jpg",
+          alt: "Momen kerja",
+          caption: "Momen di tempat kerja",
+        },
+      ],
     },
     {
-      year: "2021",
-      title: "Konsisten di Akun Real",
+      id: "suruh-apa-saja",
+      type: "experience",
+      period: "2024 — 2026",
+      title: "Suruh Apa Saja",
+      subtitle: "Founder — On-Demand Service",
       description:
-        "Setelah 6 bulan di demo, saya coba lagi di akun real dengan modal kecil. Kali ini hasilnya beda. Bukan karena saya jadi hebat, tapi karena saya disiplin. Saya paham: trading bukan soal menang cepat, tapi soal bertahan lama.",
-      icon: TrendingUp,
+        "Layanan berbasis permintaan yang saya bangun dari nol — dari angkut barang, renovasi, sampai jasa harian, semua ready 24 jam. Di sini saya belajar manajemen tim lapangan yang sesungguhnya: harus cepat, harus tanggap, dan tidak bisa mengeluh. Tahun 2025 saya juga dipercaya tampil di TV Sulsel Satu untuk bercerita soal perjalanan ini.",
+      icon: Wrench,
       tone: "emerald",
+      tag: "TV Sulsel 2025",
+      images: [
+        {
+          src: "/images/about/tv-sulsel.jpg",
+          alt: "Momen di TV Sulsel",
+          caption: "Penampilan di TV Sulsel Satu, 2025",
+        },
+      ],
     },
     {
-      year: "2023",
-      title: "Mulai Bagi Ilmu",
+      id: "ekspor-impor",
+      type: "experience",
+      period: "2025 — 2026",
+      title: "Ekspor Impor Arang",
+      subtitle: "International Trading",
       description:
-        "Makin banyak yang tanya cara mulai. Saya sadar, kebanyakan pemula mengulangi kesalahan saya dulu: terjun tanpa ilmu. Akhirnya saya mulai bikin konten edukasi sederhana untuk membantu mereka.",
-      icon: Heart,
+        "Masuk ke bisnis arang dengan skala yang lebih besar. Belajar manage supplier, dokumentasi ekspor, sampai negosiasi dengan pembeli luar negeri. Dari sini saya makin paham: bisnis yang kuat bukan soal cepat untung, tapi soal sistem yang bisa dipercaya.",
+      icon: Ship,
+      tone: "emerald",
+      images: [
+        {
+          src: "/images/about/arang-1.jpg",
+          alt: "Proses arang",
+          caption: "Proses produksi arang",
+        },
+        {
+          src: "/images/about/arang-2.jpg",
+          alt: "Pengiriman arang",
+          caption: "Persiapan pengiriman ekspor",
+        },
+      ],
+    },
+    {
+      id: "sekarang",
+      type: "insight",
+      period: "2026 — Sekarang",
+      title: "Fase Sekarang",
+      subtitle: "Waktu Bebas • Market Adil • Kontrol Diri",
+      description:
+        "Setelah semua yang saya jalani, saya sadar trading memberi saya tiga hal yang tidak saya dapatkan di tempat lain: waktu yang bebas (tidak terikat jam kerja), market yang adil (tidak peduli status sosial), dan yang paling penting — kontrol diri. Trading mengajarkan saya sabar, disiplin, dan bertanggung jawab atas setiap keputusan.",
+      icon: Target,
       tone: "emerald",
     },
   ] as TimelineItem[],
 
-  // Pelajaran dari perjalanan
   lessons: [
     {
-      title: "Modal bukan yang utama",
+      title: "Semua usaha ada waktunya",
       description:
-        "Yang bikin beda bukan besar kecilnya modal, tapi seberapa paham kamu dengan apa yang kamu lakukan.",
+        "Ada usaha yang berjalan lama, ada yang harus ditutup. Yang penting bukan hasilnya, tapi apa yang kamu bawa dari pengalaman itu.",
     },
     {
       title: "Tidak ada jalan pintas",
@@ -146,18 +256,17 @@ const STORY = {
         "Semua 'strategi rahasia' yang saya coba di awal ujungnya gagal. Yang bertahan itu disiplin, bukan trik.",
     },
     {
-      title: "Belajar itu investasi, bukan biaya",
+      title: "Kegagalan itu biaya belajar",
       description:
-        "Uang yang saya pakai buat kelas dasar dan buku justru menyelamatkan sisa modal saya dari kerugian lebih besar.",
+        "Setiap usaha yang gagal mengajarkan saya sesuatu yang tidak bisa dibeli dengan uang — sampai saya akhirnya paham cara memperlakukan uang dengan benar.",
     },
     {
-      title: "Fokus proses, bukan hasil",
+      title: "Kontrol diri mengalahkan modal",
       description:
-        "Begitu saya berhenti mengejar profit cepat dan mulai fokus ke proses yang benar, hasilnya justru mengikuti.",
+        "Yang membedakan orang sukses dan tidak bukan besar kecilnya modal, tapi seberapa bisa dia mengendalikan dirinya sendiri.",
     },
   ] as LessonItem[],
 
-  // Prinsip
   principles: [
     {
       title: "Edukasi Dulu",
@@ -189,7 +298,7 @@ const STORY = {
     headline: "Kenapa Saya Bikin Halaman Ini",
     paragraphs: [
       "Karena saya pernah di posisi kamu sekarang — bingung, takut salah, dan tidak tahu harus mulai dari mana.",
-      "Saya ingin kamu tidak mengulangi kesalahan yang saya lakukan. Kalau kamu bisa mulai dengan cara yang lebih benar, kenapa tidak?",
+      "Saya ingin kamu tidak mengulangi kesalahan yang saya lakukan. Semua usaha yang saya jalani sebelum ini mengajarkan satu hal: kalau bisa mulai dengan cara yang lebih benar, kenapa tidak?",
       "Semua link, panduan, dan video di halaman ini saya susun supaya kamu bisa jalan mandiri. Tapi kalau tetap bingung, saya selalu siap bantu.",
     ],
   },
@@ -201,7 +310,7 @@ function waLink(msg: string): string {
   return `https://wa.me/${n}?text=${encodeURIComponent(msg)}`;
 }
 
-// ============ KOMPONEN BANTU ============
+// ============ SECTION HEADER ============
 interface SectionHeaderProps {
   number: string;
   label: string;
@@ -218,11 +327,11 @@ function SectionHeader({ number, label, title, subtitle }: SectionHeaderProps) {
       className="mt-16"
     >
       <div className="flex items-center gap-3">
-        <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-amber-500 dark:text-amber-400">
+        <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-amber-400">
           {number}
         </span>
         <span className="h-px flex-1 bg-gradient-to-r from-amber-400/40 to-transparent" />
-        <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
+        <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">
           {label}
         </span>
       </div>
@@ -238,121 +347,313 @@ function SectionHeader({ number, label, title, subtitle }: SectionHeaderProps) {
   );
 }
 
-// ============ TIMELINE ============
-function Timeline({ items }: { items: TimelineItem[] }) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+// ============ IMAGE SLOT ============
+interface ImageSlotProps {
+  image: TimelineImage;
+  aspect?: "video" | "square" | "portrait";
+  index?: number;
+}
 
-  const toneMap: Record<
-    TimelineItem["tone"],
-    { dot: string; ring: string; badge: string; line: string }
-  > = {
-    slate: {
-      dot: "bg-slate-600",
-      ring: "border-slate-600",
-      badge: "bg-slate-500/15 text-slate-300",
-      line: "bg-gradient-to-b from-slate-600 to-slate-600/20",
-    },
-    amber: {
-      dot: "bg-gradient-to-br from-amber-400 to-orange-500",
-      ring: "border-amber-400",
-      badge: "bg-amber-400/15 text-amber-300",
-      line: "bg-gradient-to-b from-amber-400 to-amber-400/20",
-    },
-    emerald: {
-      dot: "bg-gradient-to-br from-emerald-400 to-teal-500",
-      ring: "border-emerald-400",
-      badge: "bg-emerald-400/15 text-emerald-300",
-      line: "bg-gradient-to-b from-emerald-400 to-emerald-400/20",
-    },
-  };
+function ImageSlot({ image, aspect = "video", index = 0 }: ImageSlotProps) {
+  const [error, setError] = useState<boolean>(false);
+
+  const aspectClass =
+    aspect === "video"
+      ? "aspect-video"
+      : aspect === "square"
+        ? "aspect-square"
+        : "aspect-[4/5]";
+
+  const hasImage = image.src.length > 0 && !error;
 
   return (
-    <div className="mt-8">
-      {items.map((item, i) => {
-        const Icon = item.icon;
-        const isLast = i === items.length - 1;
-        const isOpen = openIndex === i;
-        const tone = toneMap[item.tone];
-
-        return (
+    <motion.div
+      whileHover={{ y: -2 }}
+      className={`group relative overflow-hidden rounded-2xl border ${
+        hasImage
+          ? "border-white/10"
+          : "border-dashed border-white/15 bg-white/[0.02]"
+      } ${aspectClass}`}
+    >
+      {hasImage ? (
+        <>
+          <Image
+            src={image.src}
+            alt={image.alt}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            loading="lazy"
+            onError={() => setError(true)}
+            className="object-cover transition duration-700 group-hover:scale-105"
+          />
+          {image.caption && (
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-3">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-wider text-white/90">
+                {image.caption}
+              </p>
+            </div>
+          )}
+          <div className="pointer-events-none absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm">
+            <Camera className="h-3 w-3 text-white/70" />
+          </div>
+        </>
+      ) : (
+        <div className="flex h-full w-full flex-col items-center justify-center gap-2 p-4 text-center">
           <motion.div
-            key={`${item.year}-${item.title}`}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.15 }}
-            transition={{ delay: i * 0.05 }}
-            className="relative flex gap-4"
+            animate={{ y: [0, -4, 0] }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.04]"
           >
-            {/* Timeline column */}
-            <div className="relative flex w-10 shrink-0 flex-col items-center">
-              <button
-                type="button"
-                onClick={() => setOpenIndex(isOpen ? null : i)}
-                aria-label={`Lihat detail ${item.year}`}
-                className={`relative z-10 mt-1 flex h-10 w-10 items-center justify-center rounded-full border-2 transition ${
-                  isOpen
-                    ? `${tone.ring} ${tone.dot}`
-                    : `border-white/10 bg-[#08090c] hover:${tone.ring}`
-                }`}
-              >
-                <Icon
-                  className={`h-4 w-4 ${
-                    isOpen ? "text-black" : "text-slate-400"
-                  }`}
-                />
-              </button>
-              {!isLast && (
-                <div className={`mt-1 w-px flex-1 ${tone.line}`} />
-              )}
-            </div>
-
-            {/* Content */}
-            <div className={`flex-1 ${isLast ? "pb-0" : "pb-8"}`}>
-              <button
-                type="button"
-                onClick={() => setOpenIndex(isOpen ? null : i)}
-                className="group flex w-full items-start justify-between gap-3 text-left"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      className={`rounded-sm px-2 py-0.5 font-mono text-[10px] font-black tracking-widest ${tone.badge}`}
-                    >
-                      {item.year}
-                    </span>
-                  </div>
-                  <h3 className="mt-2 text-base font-black uppercase tracking-tight text-white sm:text-lg">
-                    {item.title}
-                  </h3>
-                </div>
-                <motion.span
-                  animate={{ rotate: isOpen ? 180 : 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="mt-2 shrink-0 text-slate-500 group-hover:text-slate-300"
-                >
-                  <ChevronDown className="h-4 w-4" />
-                </motion.span>
-              </button>
-
-              <AnimatePresence initial={false}>
-                {isOpen && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="overflow-hidden"
-                  >
-                    <p className="mt-2 text-sm leading-relaxed text-slate-400">
-                      {item.description}
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            <Camera className="h-5 w-5 text-slate-500" />
           </motion.div>
-        );
-      })}
+          <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">
+            Foto {index + 1}
+          </p>
+          <p className="max-w-[80%] text-[9px] leading-tight text-slate-600">
+            {image.caption ?? "Akan ditambahkan"}
+          </p>
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+// ============ IMAGE GRID ============
+interface ImageGridProps {
+  images: TimelineImage[];
+}
+
+function ImageGrid({ images }: ImageGridProps) {
+  if (images.length === 0) return null;
+
+  if (images.length === 1) {
+    return (
+      <div className="mt-5">
+        <ImageSlot image={images[0]} aspect="video" index={0} />
+      </div>
+    );
+  }
+
+  if (images.length === 2) {
+    return (
+      <div className="mt-5 grid grid-cols-2 gap-3">
+        <ImageSlot image={images[0]} aspect="square" index={0} />
+        <ImageSlot image={images[1]} aspect="square" index={1} />
+      </div>
+    );
+  }
+
+  const [first, ...rest] = images;
+  return (
+    <div className="mt-5 space-y-3">
+      <ImageSlot image={first} aspect="video" index={0} />
+      <div
+        className={`grid gap-3 ${
+          rest.length === 1
+            ? "grid-cols-1"
+            : rest.length === 2
+              ? "grid-cols-2"
+              : "grid-cols-3"
+        }`}
+      >
+        {rest.map((img, i) => (
+          <ImageSlot
+            key={`${img.src}-${i}`}
+            image={img}
+            aspect="square"
+            index={i + 1}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ============ INSIGHT CARD ============
+function InsightCard({ item }: { item: TimelineItem }) {
+  const Icon = item.icon;
+  const tone = {
+    slate: {
+      border: "border-slate-500/20",
+      glow: "bg-slate-500/10",
+      icon: "text-slate-300",
+      accent: "text-slate-300",
+      bg: "from-slate-500/[0.06] via-transparent to-slate-500/[0.02]",
+    },
+    amber: {
+      border: "border-amber-400/25",
+      glow: "bg-amber-400/15",
+      icon: "text-amber-400",
+      accent: "text-amber-400",
+      bg: "from-amber-500/[0.08] via-transparent to-orange-500/[0.03]",
+    },
+    emerald: {
+      border: "border-emerald-400/25",
+      glow: "bg-emerald-400/15",
+      icon: "text-emerald-400",
+      accent: "text-emerald-400",
+      bg: "from-emerald-500/[0.08] via-transparent to-teal-500/[0.03]",
+    },
+  }[item.tone];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      className={`relative overflow-hidden rounded-3xl border ${tone.border} bg-gradient-to-br ${tone.bg} p-5 sm:p-6`}
+    >
+      <div
+        className={`pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full ${tone.glow} blur-3xl`}
+      />
+
+      <div className="relative flex items-start gap-4">
+        <div
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border ${tone.border} bg-black/30`}
+        >
+          <Icon className={`h-5 w-5 ${tone.icon}`} />
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className={`font-mono text-[10px] font-black uppercase tracking-[0.25em] ${tone.accent}`}
+            >
+              {item.period}
+            </span>
+            <span className="rounded-sm bg-white/[0.06] px-2 py-0.5 font-mono text-[9px] font-black uppercase tracking-widest text-slate-400">
+              Insight
+            </span>
+          </div>
+
+          <h3 className="mt-2 text-lg font-black uppercase tracking-tight text-white sm:text-xl">
+            {item.title}
+          </h3>
+          {item.subtitle && (
+            <p
+              className={`mt-0.5 font-mono text-[10px] font-bold uppercase tracking-widest ${tone.accent}`}
+            >
+              {item.subtitle}
+            </p>
+          )}
+          <p className="mt-3 text-sm leading-relaxed text-slate-300">
+            {item.description}
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ============ EXPERIENCE CARD ============
+interface ExperienceCardProps {
+  item: TimelineItem;
+  index: number;
+}
+
+function ExperienceCard({ item, index }: ExperienceCardProps) {
+  const Icon = item.icon;
+  const tone = {
+    slate: {
+      num: "text-slate-500",
+      border: "border-white/[0.06] hover:border-white/20",
+      iconBg: "bg-slate-500/10",
+      icon: "text-slate-300",
+      period: "text-slate-400",
+    },
+    amber: {
+      num: "text-amber-400",
+      border: "border-amber-400/15 hover:border-amber-400/40",
+      iconBg: "bg-amber-400/10",
+      icon: "text-amber-400",
+      period: "text-amber-400",
+    },
+    emerald: {
+      num: "text-emerald-400",
+      border: "border-emerald-400/15 hover:border-emerald-400/40",
+      iconBg: "bg-emerald-400/10",
+      icon: "text-emerald-400",
+      period: "text-emerald-400",
+    },
+  }[item.tone];
+
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{ delay: index * 0.04 }}
+      className={`group relative overflow-hidden rounded-3xl border bg-white/[0.02] p-5 transition ${tone.border} sm:p-6`}
+    >
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${tone.iconBg}`}
+          >
+            <Icon className={`h-4 w-4 ${tone.icon}`} />
+          </div>
+          <div>
+            <span
+              className={`block font-mono text-[10px] font-black uppercase tracking-[0.25em] ${tone.period}`}
+            >
+              {item.period}
+            </span>
+            {item.subtitle && (
+              <span className="mt-0.5 block font-mono text-[9px] font-bold uppercase tracking-widest text-slate-500">
+                {item.subtitle}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <span
+          className={`font-mono text-2xl font-black tabular-nums ${tone.num} opacity-40`}
+        >
+          {String(index + 1).padStart(2, "0")}
+        </span>
+      </div>
+
+      <h3 className="mt-5 text-2xl font-black uppercase leading-tight tracking-tight text-white sm:text-3xl">
+        {item.title}
+      </h3>
+
+      {item.tag && (
+        <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1">
+          <Tv className="h-3 w-3 text-amber-400" />
+          <span className="font-mono text-[9px] font-black uppercase tracking-widest text-amber-400">
+            {item.tag}
+          </span>
+        </div>
+      )}
+
+      <p className="mt-4 text-sm leading-relaxed text-slate-300">
+        {item.description}
+      </p>
+
+      {item.images && item.images.length > 0 && (
+        <ImageGrid images={item.images} />
+      )}
+    </motion.article>
+  );
+}
+
+// ============ TIMELINE ============
+function Timeline({ items }: { items: TimelineItem[] }) {
+  return (
+    <div className="mt-6 space-y-4">
+      {items.map((item, i) =>
+        item.type === "insight" ? (
+          <InsightCard key={item.id} item={item} />
+        ) : (
+          <ExperienceCard key={item.id} item={item} index={i} />
+        ),
+      )}
     </div>
   );
 }
@@ -361,7 +662,6 @@ function Timeline({ items }: { items: TimelineItem[] }) {
 export default function AboutPage() {
   return (
     <div className="relative min-h-screen bg-[#08090c] text-white">
-      {/* Background */}
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div
           className="absolute inset-0"
@@ -380,7 +680,7 @@ export default function AboutPage() {
       </div>
 
       <main className="mx-auto max-w-2xl px-5 py-12 pb-24">
-        {/* ================= BACK ================= */}
+        {/* BACK */}
         <Link
           href="/"
           className="group inline-flex items-center gap-2 font-mono text-[10px] font-black uppercase tracking-widest text-amber-400 transition hover:gap-3"
@@ -389,7 +689,7 @@ export default function AboutPage() {
           Kembali ke Beranda
         </Link>
 
-        {/* ================= HERO PROFIL ================= */}
+        {/* HERO PROFIL */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -451,7 +751,6 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* Headline */}
           <div className="mt-8">
             <h2 className="text-3xl font-black uppercase leading-[1.05] tracking-tight sm:text-4xl md:text-5xl">
               <span className="block bg-gradient-to-br from-amber-200 via-amber-400 to-orange-500 bg-clip-text text-transparent">
@@ -463,35 +762,57 @@ export default function AboutPage() {
             </p>
           </div>
 
-          {/* Quote */}
-          <div className="mt-8 rounded-2xl border border-amber-400/20 bg-gradient-to-br from-amber-500/[0.06] via-transparent to-orange-500/[0.03] p-5">
-            <Quote className="h-5 w-5 text-amber-400" />
-            <p className="mt-3 text-sm italic leading-relaxed text-slate-200">
-              &ldquo;Saya dulu pikir trading itu soal keberuntungan. Sekarang
-              saya tahu, ini soal kedisiplinan dan kesabaran.&rdquo;
+          <div className="relative mt-8 overflow-hidden rounded-2xl border border-amber-400/20 bg-gradient-to-br from-amber-500/[0.06] via-transparent to-orange-500/[0.03] p-5">
+            <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-amber-400/10 blur-2xl" />
+            <Quote className="relative h-5 w-5 text-amber-400" />
+            <p className="relative mt-3 text-sm italic leading-relaxed text-slate-200">
+              &ldquo;{STORY.intro.quote}&rdquo;
             </p>
-            <p className="mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-amber-400">
+            <p className="relative mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-amber-400">
               — CANGBOY
             </p>
           </div>
+
+          <div className="mt-8 grid grid-cols-3 gap-3">
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 text-center">
+              <p className="font-mono text-2xl font-black text-amber-400">9+</p>
+              <p className="mt-1 font-mono text-[9px] font-black uppercase tracking-widest text-slate-500">
+                Tahun Usaha
+              </p>
+            </div>
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 text-center">
+              <p className="font-mono text-2xl font-black text-amber-400">6</p>
+              <p className="mt-1 font-mono text-[9px] font-black uppercase tracking-widest text-slate-500">
+                Bidang
+              </p>
+            </div>
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 text-center">
+              <p className="font-mono text-2xl font-black text-amber-400">
+                2026
+              </p>
+              <p className="mt-1 font-mono text-[9px] font-black uppercase tracking-widest text-slate-500">
+                Full Trading
+              </p>
+            </div>
+          </div>
         </motion.section>
 
-        {/* ================= TIMELINE ================= */}
+        {/* TIMELINE */}
         <SectionHeader
           number="01"
           label="JOURNEY"
           title="Perjalanan Sebelum Jadi Trader"
-          subtitle="Dari bingung sampai konsisten"
+          subtitle="Dari usaha fisik sampai trading"
         />
 
         <Timeline items={STORY.timeline} />
 
-        {/* ================= PELAJARAN ================= */}
+        {/* PELAJARAN */}
         <SectionHeader
           number="02"
           label="LESSON LEARNED"
           title="Yang Saya Pelajari"
-          subtitle="Dari pengalaman pahit"
+          subtitle="Dari 9 tahun perjalanan"
         />
 
         <div className="mt-6 space-y-3">
@@ -502,7 +823,7 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ delay: i * 0.06 }}
-              className="flex items-start gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4"
+              className="flex items-start gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 transition hover:border-amber-400/20"
             >
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-400/10">
                 <Lightbulb className="h-4 w-4 text-amber-400" />
@@ -519,7 +840,7 @@ export default function AboutPage() {
           ))}
         </div>
 
-        {/* ================= PRINSIP ================= */}
+        {/* PRINSIP */}
         <SectionHeader
           number="03"
           label="PRINCIPLES"
@@ -554,7 +875,7 @@ export default function AboutPage() {
           })}
         </div>
 
-        {/* ================= CLOSING ================= */}
+        {/* CLOSING */}
         <SectionHeader
           number="04"
           label="CLOSING"
@@ -570,14 +891,18 @@ export default function AboutPage() {
           {STORY.closing.paragraphs.map((p, i) => (
             <p
               key={i}
-              className="text-sm leading-relaxed text-slate-300 last:text-slate-400"
+              className={`text-sm leading-relaxed ${
+                i === STORY.closing.paragraphs.length - 1
+                  ? "text-slate-400"
+                  : "text-slate-300"
+              }`}
             >
               {p}
             </p>
           ))}
         </motion.div>
 
-        {/* ================= CTA ================= */}
+        {/* CTA */}
         <motion.section
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -623,7 +948,7 @@ export default function AboutPage() {
           </div>
         </motion.section>
 
-        {/* ================= SOCIAL ================= */}
+        {/* SOCIAL */}
         <section className="mt-10">
           <p className="mb-3 text-center font-mono text-[10px] font-black uppercase tracking-[0.25em] text-slate-500">
             {"// ikuti keseharian saya"}
@@ -659,7 +984,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* ================= FOOTER ================= */}
+        {/* FOOTER */}
         <footer className="mt-16 border-t border-white/[0.06] pt-6 text-center">
           <div className="flex items-center justify-center gap-2">
             <div className="relative h-6 w-6 overflow-hidden rounded-lg ring-1 ring-amber-400/40">

@@ -52,9 +52,9 @@ const SITE = {
   heroBackground: "/hero-bg.jpg",
   about: {
     title: "Tentang Cangboy",
-    p1: "Halo, saya Cangboy. Setelah 9 tahun coba berbagai usaha — dari YouTube, bisnis minuman, telur gulung, sampai ekspor arang — akhirnya saya menemukan rumah di trading.",
+    p1: "Halo, saya Cangboy. Saya trader dan content creator yang fokus membantu pemula memahami dunia trading dengan cara yang lebih sederhana.",
     p2: "Lewat halaman ini, saya kumpulkan semua link, panduan, dan komunitas yang saya pakai sehari-hari — supaya kamu tidak perlu bingung mulai dari mana.",
-    p3: "Kalau kamu baru mulai, saya sudah siapkan panduan lengkap dari daftar akun sampai tersambung ke MetaTrader 5. Tinggal ikuti, tidak perlu bingung.",
+    p3: "Kalau kamu baru pertama kali, ikuti panduan di bawah dari fase 01 sampai selesai. Saya sudah siapkan video + langkah demi langkah.",
   },
   socials: {
     instagram: "https://instagram.com/thisiscangboy",
